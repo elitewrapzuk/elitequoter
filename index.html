@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Elite Wrapz Quote Maker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      margin: 0;
+      padding: 15px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    h2 {
+      color: #00a884;
+      font-size: 1.2em;
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; margin-bottom: 4px; font-size: 0.9em; }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .btn {
+      background: #00a884;
+      color: #fff;
+      padding: 12px 18px;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      display: inline-block;
+      text-align: center;
+    }
+    .btn:hover { background: #008f72; }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background: #fff;
+      margin: 10% auto;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      overflow: hidden; /* ensures bar matches rounded corners */
+    }
+    .modal-header {
+      background: #00a884;
+      color: #fff;
+      padding: 12px;
+      font-size: 1.1em;
+      font-weight: bold;
+      text-align: center;
+    }
+    .modal-body {
+      padding: 20px;
+    }
+    .modal-body h2 {
+      color: #00a884;
+      text-align: center;
+    }
+    .close {
+      float: right;
+      font-size: 22px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+    }
+    .close:hover { color: #000; }
+  </style>
+</head>
+<body>
+
+<!-- Logo -->
+<div style="text-align:center; margin:20px 0;">
+  <img src="elitewrapz.png" alt="Elite Wrapz Logo" style="max-width:220px;height:auto;" />
+</div>
+
+
+<form id="quoteForm">
+  <!-- Client Info -->
+  <div class="card">
+    <h2>Client Info</h2>
+    <div class="form-group"><label>Name</label><input type="text" id="clientName" required></div>
+    <div class="form-group"><label>Email</label><input type="email" id="clientEmail"></div>
+    <div class="form-group"><label>Phone</label><input type="text" id="clientPhone"></div>
+    <div class="form-group"><label>Address</label><textarea id="clientAddress"></textarea></div>
+  </div>
+
+  <!-- Areas -->
+  <div class="card">
+    <h2>Vinyl Areas</h2>
+    <div id="areas"></div>
+    <button type="button" class="btn" onclick="addArea()">+ Add Area</button>
+  </div>
+
+  <!-- Job Details -->
+  <div class="card">
+    <h2>Job Details</h2>
+    <div class="form-group"><label>Estimated Hours</label><input type="number" id="jobHours" step="0.1"></div>
+    <div class="form-group"><label>Accommodation Nights</label><input type="number" id="accomNights"></div>
+    <div class="form-group"><label>EV Charge Cost (£)</label><input type="number" id="travelBuffer" step="0.01"></div>
+    <div class="form-group"><label>Repairs</label>
+      <select id="repairs"><option>None</option><option>Low</option><option>Medium</option><option>High</option></select>
+    </div>
+    <div class="form-group"><label>Extra Charges (£)</label><input type="number" id="extraCharges" step="0.01"></div>
+  </div>
+
+  <!-- Discount -->
+  <div class="card">
+    <h2>Discount</h2>
+    <div class="form-group"><label>Discount %</label><input type="number" id="discountPercent" step="1"></div>
+    <div class="form-group"><label>Discount Name</label><input type="text" id="discountName"></div>
+  </div>
+
+  <!-- Notes -->
+  <div class="card">
+    <h2>Notes</h2>
+    <textarea id="notes"></textarea>
+  </div>
+
+  <button type="button" class="btn" onclick="previewQuote()">Preview Quote</button>
+</form>
+
+<!-- Preview Modal -->
+<div id="quoteModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      Quote Preview
+      <span class="close" onclick="closeModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div id="quotePreview"></div>
+      <br>
+      <button class="btn" onclick="submitQuote()">Save & Email</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="emailModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      Email Status
+      <span class="close" onclick="closeEmailModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div id="emailStatus"></div>
+      <br>
+      <button class="btn" onclick="closeEmailModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let lastTotal = 0;
+  let lockedDeposit = 0;
+
+  function addArea() {
+    const container = document.getElementById("areas");
+    const idx = container.children.length + 1;
+    const div = document.createElement("div");
+    div.className = "form-group";
+    div.style.borderBottom = "1px solid #eee";
+    div.style.paddingBottom = "10px";
+    div.style.marginBottom = "10px";
+    div.innerHTML = `
+      <label>Area ${idx} Label</label>
+      <input type="text" name="areaLabel${idx}" required>
+      <label>Linear Metres</label>
+      <input type="number" name="areaLm${idx}" step="0.01" required>
+      <label>Quantity</label>
+      <input type="number" name="areaQty${idx}" value="1" required>
+      <label>Cost per LM (£)</label>
+      <input type="number" name="areaCost${idx}" step="0.01" required>
+      <label>Vinyl Product Code</label>
+      <input type="text" name="areaCode${idx}">
+    `;
+    container.appendChild(div);
+  }
+
+  function previewQuote() {
+    const total = lastTotal ? lastTotal.toFixed(2) : "Calculated on Save";
+    const deposit = lockedDeposit ? lockedDeposit.toFixed(2) : "Calculated on Save";
+    document.getElementById("quotePreview").innerHTML = `
+      <p><strong>Quote will be saved & emailed.</strong></p>
+      <p><strong>Final Total:</strong> £${total}</p>
+      <p><strong>Deposit Required:</strong> £${deposit}</p>
+      <small>(Full breakdown is included in your internal PDF & email)</small>
+    `;
+    document.getElementById("quoteModal").style.display = "block";
+  }
+
+  function submitQuote() {
+    document.getElementById("quoteModal").style.display = "none";
+    document.getElementById("emailModal").style.display = "block";
+    document.getElementById("emailStatus").innerText = "⏳ Sending...";
+
+    const areaDivs = document.querySelectorAll("#areas .form-group");
+    let areas = [];
+    areaDivs.forEach((div, i) => {
+      const label = div.querySelector(`input[name='areaLabel${i+1}']`).value;
+      const lm = div.querySelector(`input[name='areaLm${i+1}']`).value;
+      const qty = div.querySelector(`input[name='areaQty${i+1}']`).value;
+      const cost = div.querySelector(`input[name='areaCost${i+1}']`).value;
+      const code = div.querySelector(`input[name='areaCode${i+1}']`).value;
+      areas.push({ label, lm, qty, costPerLM: cost, code });
+    });
+
+    fetch("https://script.google.com/macros/s/AKfycbwDtfMaObFsfAgs2jMSGa93EKsljS6U18oE04BH5KqdPAjqYfMpHX7GL-u8AReEzus/exec", {
+      method: "POST",
+      body: new URLSearchParams({
+        clientName: document.getElementById("clientName").value,
+        clientEmail: document.getElementById("clientEmail").value,
+        clientPhone: document.getElementById("clientPhone").value,
+        clientAddress: document.getElementById("clientAddress").value,
+        jobHours: document.getElementById("jobHours").value,
+        accomNights: document.getElementById("accomNights").value,
+        travelBuffer: document.getElementById("travelBuffer").value,
+        repairs: document.getElementById("repairs").value,
+        extraCharges: document.getElementById("extraCharges").value,
+        discountPercent: document.getElementById("discountPercent").value,
+        discountName: document.getElementById("discountName").value,
+        notes: document.getElementById("notes").value,
+        areas: JSON.stringify(areas)
+      })
+    })
+    .then(res=>res.json())
+    .then(res=>{
+      if(res.success){
+        const expiry = new Date();
+        expiry.setDate(expiry.getDate() + 30);
+        const expiryDate = expiry.toLocaleDateString("en-GB");
+        const clientName = document.getElementById("clientName").value || "Client";
+        const clientEmail = document.getElementById("clientEmail").value || "";
+        const quoteRef = res.quoteNumber || "";
+        const total = res.totalWithMargin ? res.totalWithMargin.toFixed(2) : "0.00";
+        const deposit = res.deposit ? res.deposit.toFixed(2) : "0.00";
+        lastTotal = res.totalWithMargin;
+        lockedDeposit = res.deposit;
+
+        const subject = encodeURIComponent(`Your Elite Wrapz Quote | ${quoteRef}`);
+        const body = encodeURIComponent(
+`Hi ${clientName},
+
+Thank you for considering Elite Wrapz for your vinyl wrapping needs. We are pleased to provide you with your quote (Quote Number: ${quoteRef}) as follows:
+
+TOTAL QUOTE: £${total}
+DEPOSIT REQUIRED: £${deposit}
+
+All payments are to be made via bank transfer. The deposit is due upon acceptance of this quote to secure your booking. The final invoice is due on-site once the work has been completed.
+
+To accept this quote, please reply to this email, quoting the quote number provided above. Alternatively, you may contact us via WhatsApp on 07424088434, also quoting your quote number.
+
+You can also opt for an interest-free payment plan (minus the deposit). Contact us for details.
+
+IMPORTANT INFORMATION:
+- DISCOUNTS: Quote total doesn't include any discounts, these will be deducted upon final invoice
+- QUOTE VALIDITY: Valid until ${expiryDate}
+- FULL TERMS: Our full Terms & Conditions can be found here - www.elitewrapz.uk/termsandconditions
+- VAT: As a sole trader, Elite Wrapz is not VAT registered, and VAT is not currently charged
+
+We look forward to assisting you with your vinyl wrapping project!
+
+Best regards,
+Elite Wrapz`
+        );
+
+        const mailtoLink = `mailto:${clientEmail}?subject=${subject}&body=${body}`;
+        document.getElementById("emailStatus").innerHTML = `
+          ✅ Quote saved & emailed (Ref: ${quoteRef})<br>
+          <strong>FINAL TOTAL:</strong> £${total}<br>
+          <strong>DEPOSIT REQUIRED:</strong> £${deposit}<br><br>
+          <a href="${mailtoLink}" class="btn" style="text-decoration:none;">📧 Email Quote to Client</a>
+        `;
+      } else {
+        document.getElementById("emailStatus").innerText=`❌ Error: ${res.error}`;
+      }
+    })
+    .catch(err=>{
+      document.getElementById("emailStatus").innerText=`❌ Network Error: ${err.message}`;
+    });
+  }
+
+  function closeModal(){ document.getElementById("quoteModal").style.display="none"; }
+  function closeEmailModal(){ document.getElementById("emailModal").style.display="none"; }
+</script>
+</body>
+</html>
