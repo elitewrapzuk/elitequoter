@@ -1,313 +1,368 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Elite Wrapz Quote Maker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      color: #222;
-      margin: 0;
-      padding: 15px;
-    }
-    .card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-    h2 {
-      color: #00a884;
-      font-size: 1.2em;
-      margin-top: 0;
-      margin-bottom: 12px;
-    }
-    .form-group { margin-bottom: 12px; }
-    label { display: block; margin-bottom: 4px; font-size: 0.9em; }
-    input, textarea, select {
-      width: 100%;
-      padding: 10px;
-      font-size: 1em;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-    .btn {
-      background: #00a884;
-      color: #fff;
-      padding: 12px 18px;
-      font-size: 1em;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 10px;
-      display: inline-block;
-      text-align: center;
-    }
-    .btn:hover { background: #008f72; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Wrapz | New Quote</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --brand: #01FABF; }
+        
+        /* PDF Optimization */
+        @media print {
+            @page { size: A4; margin: 0.8cm; }
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; margin: 0; font-size: 10pt; }
+            .print-card { 
+                border: 1px solid #eee; 
+                box-shadow: none !important; 
+                width: 100% !important;
+                max-width: 100% !important;
+                position: static !important;
+                border-radius: 0 !important;
+            }
+            .brand-bg { background-color: #01FABF !important; -webkit-print-color-adjust: exact; }
+            .brand-text { color: #01FABF !important; -webkit-print-color-adjust: exact; }
+            .grid { display: block !important; }
+            #quoteOutput { margin: 0 !important; border: none !important; }
+        }
 
-    /* Modal Styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      overflow: auto;
-      background: rgba(0,0,0,0.5);
-    }
-    .modal-content {
-      background: #fff;
-      margin: 10% auto;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      overflow: hidden; /* ensures bar matches rounded corners */
-    }
-    .modal-header {
-      background: #00a884;
-      color: #fff;
-      padding: 12px;
-      font-size: 1.1em;
-      font-weight: bold;
-      text-align: center;
-    }
-    .modal-body {
-      padding: 20px;
-    }
-    .modal-body h2 {
-      color: #00a884;
-      text-align: center;
-    }
-    .close {
-      float: right;
-      font-size: 22px;
-      font-weight: bold;
-      color: #fff;
-      cursor: pointer;
-    }
-    .close:hover { color: #000; }
-  </style>
+        .brand-border-focus:focus { border-color: var(--brand); ring: 2px; ring-color: var(--brand); }
+    </style>
 </head>
-<body>
+<body class="bg-slate-50 min-h-screen p-3 md:p-6 font-sans text-slate-800">
 
-<!-- Logo -->
-<div style="text-align:center; margin:20px 0;">
-  <img src="elitewrapz.png" alt="Elite Wrapz Logo" style="max-width:220px;height:auto;" />
-</div>
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Input Section -->
+        <div class="lg:col-span-2 space-y-4 no-print">
+            <!-- Header with Logo -->
+            <div class="flex flex-col sm:flex-row items-center justify-between bg-white p-4 rounded-xl shadow-sm border-l-4 border-[#01FABF] gap-4">
+                <div class="flex items-center gap-4">
+                    <img src="elitewrapz.png" alt="Logo" class="h-12 w-auto object-contain" onerror="this.style.display='none'">
+                    <div>
+                        <h1 class="text-xl font-black text-slate-900 italic tracking-tighter uppercase">Elite Wrapz</h1>
+                        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.2em]">Business Manager</p>
+                    </div>
+                </div>
+                <div class="text-center sm:text-right">
+                    <p id="liveDate" class="text-[9px] text-slate-400 font-mono uppercase"></p>
+                </div>
+            </div>
 
+            <!-- Client Info -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-sm font-black mb-3 flex items-center gap-2 uppercase tracking-wider">
+                    <span class="w-1.5 h-4 bg-[#01FABF] rounded-full"></span>
+                    Project Identification
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Client Name</label>
+                        <input type="text" id="clientName" placeholder="e.g. Andy Smith" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Quote Reference</label>
+                        <input type="text" id="quoteRef" readonly class="w-full p-2 text-sm border rounded-md bg-slate-50 font-mono font-bold text-slate-900">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Site Address / Project Title</label>
+                        <input type="text" id="projectRef" placeholder="e.g. Kitchen Refurbishment, SE1" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
+                    </div>
+                </div>
+            </div>
 
-<form id="quoteForm">
-  <!-- Client Info -->
-  <div class="card">
-    <h2>Client Info</h2>
-    <div class="form-group"><label>Name</label><input type="text" id="clientName" required></div>
-    <div class="form-group"><label>Email</label><input type="email" id="clientEmail"></div>
-    <div class="form-group"><label>Phone</label><input type="text" id="clientPhone"></div>
-    <div class="form-group"><label>Address</label><textarea id="clientAddress"></textarea></div>
-  </div>
+            <!-- Vinyl Sections -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-sm font-black flex items-center gap-2 uppercase tracking-wider">
+                        <span class="w-1.5 h-4 bg-[#01FABF] rounded-full"></span>
+                        Vinyl Breakdown
+                    </h2>
+                    <div class="flex items-center gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="vinylVatToggle" checked class="w-3.5 h-3.5 accent-[#01FABF]">
+                            <span class="text-[9px] font-black text-slate-400 uppercase">Apply 20% VAT to Vinyl Cost</span>
+                        </label>
+                        <button onclick="addVinylRow()" class="text-[10px] bg-slate-900 text-white px-3 py-1 rounded-full hover:bg-black transition font-black uppercase">+ Add Area</button>
+                    </div>
+                </div>
+                <div id="vinylRows" class="space-y-3"></div>
+            </div>
 
-  <!-- Areas -->
-  <div class="card">
-    <h2>Vinyl Areas</h2>
-    <div id="areas"></div>
-    <button type="button" class="btn" onclick="addArea()">+ Add Area</button>
-  </div>
+            <!-- Costs Section -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-sm font-black mb-3 flex items-center gap-2 uppercase tracking-wider">
+                    <span class="w-1.5 h-4 bg-[#01FABF] rounded-full"></span>
+                    Logistics & Margin
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Labour Hours</label>
+                        <input type="number" id="labourHours" value="0" step="0.5" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
+                        <p class="text-[9px] text-[#01FABF] font-black mt-1 uppercase italic">System Rate: £45/hr</p>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Shipping (£)</label>
+                        <input type="number" id="importFees" value="0" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Accommodation (£)</label>
+                        <input type="number" id="accommodation" value="0" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Travel (£)</label>
+                        <input type="number" id="travel" value="0" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Postage (£)</label>
+                        <input type="number" id="postage" value="0" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sundries (£)</label>
+                        <input type="number" id="extras" value="0" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1 text-red-500">Discount %</label>
+                        <input type="number" id="discountPercent" value="0" class="w-full p-2 text-sm border rounded-md border-red-100 outline-none focus:ring-1 focus:ring-red-400">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Margin %</label>
+                        <input type="number" id="margin" value="30" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
+                    </div>
+                </div>
+            </div>
 
-  <!-- Job Details -->
-  <div class="card">
-    <h2>Job Details</h2>
-    <div class="form-group"><label>Estimated Hours</label><input type="number" id="jobHours" step="0.1"></div>
-    <div class="form-group"><label>Accommodation Nights</label><input type="number" id="accomNights"></div>
-    <div class="form-group"><label>EV Charge Cost (£)</label><input type="number" id="travelBuffer" step="0.01"></div>
-    <div class="form-group"><label>Repairs</label>
-      <select id="repairs"><option>None</option><option>Low</option><option>Medium</option><option>High</option></select>
+            <button onclick="window.print()" class="w-full bg-[#01FABF] text-slate-900 py-4 rounded-xl font-black hover:brightness-105 transition flex items-center justify-center gap-3 shadow-lg shadow-[#01FABF]/10 active:scale-[0.99]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                SAVE SINGLE-PAGE PDF RECORD
+            </button>
+        </div>
+
+        <!-- Result Sidebar (PDF View) -->
+        <div class="lg:sticky lg:top-4 h-fit">
+            <div id="quoteOutput" class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden print-card">
+                
+                <div class="p-5 bg-slate-900 text-white relative brand-bg">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="elitewrapz.png" alt="Elite Wrapz" class="h-10 w-auto brightness-0 invert" id="pdfLogo">
+                        <div>
+                            <h3 class="font-bold text-slate-900 uppercase tracking-[0.2em] text-[8px] opacity-60">Job Reference</h3>
+                            <p id="outQuoteNum" class="text-lg font-black tracking-tighter italic text-slate-900">EW-DRAFT</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-3 border-t border-slate-900/20">
+                        <p id="outClient" class="text-md font-black truncate text-slate-900 uppercase">CLIENT NAME</p>
+                        <p id="outRef" class="text-[9px] text-slate-900/70 truncate uppercase font-bold tracking-tight">ADDRESS / PROJECT</p>
+                    </div>
+                </div>
+                
+                <div class="p-5 space-y-4">
+                    <!-- Pricing Table -->
+                    <div class="space-y-1.5 text-[10px]">
+                        <div class="flex justify-between border-b border-slate-100 pb-1">
+                            <span class="text-slate-500 font-bold uppercase">Materials Subtotal</span>
+                            <span id="resMaterials" class="font-black text-slate-900">£0.00</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-100 pb-1">
+                            <span class="text-slate-500 font-bold uppercase">Expenses & Logistics</span>
+                            <span id="resLogistics" class="font-black text-slate-900">£0.00</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-100 pb-1">
+                            <span class="text-slate-500 font-bold uppercase">Labour Allocation</span>
+                            <span id="resLabour" class="font-black text-slate-900">£0.00</span>
+                        </div>
+                        <div id="discountRow" class="hidden flex justify-between text-red-600 font-black italic">
+                            <span>Applied Discount</span>
+                            <span id="resDiscount">-£0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 flex justify-between items-center">
+                        <div class="text-[8px] font-black text-slate-400 uppercase">Estimated Net Profit</div>
+                        <div id="resProfit" class="text-sm font-black text-green-600 tracking-tighter">£0.00</div>
+                    </div>
+
+                    <div class="pt-1 border-t border-slate-100">
+                        <div class="flex justify-between items-end">
+                            <span class="text-[9px] font-black text-slate-400 uppercase pb-1 tracking-widest">Total Quote</span>
+                            <span id="resTotal" class="text-3xl font-black text-slate-900 tracking-tighter leading-none">£0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Cards -->
+                    <div class="p-5 bg-slate-900 text-[#01FABF] rounded-xl shadow-inner">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-black uppercase text-[9px] tracking-widest opacity-80">Booking Deposit</span>
+                            <span class="text-[8px] font-bold bg-[#01FABF] text-slate-900 px-1.5 py-0.5 rounded">RESERVE DATE</span>
+                        </div>
+                        <div id="resDeposit" class="text-4xl font-black tracking-tighter leading-none">£0.00</div>
+                        <div class="mt-4 pt-3 border-t border-[#01FABF]/20">
+                            <div class="flex justify-between items-center text-[10px] font-black">
+                                <span class="opacity-70">Remaining Balance</span>
+                                <span id="resBalance" class="text-white">£0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Material Breakdown for Print -->
+                    <div id="printItemList" class="hidden print:block text-[8px] space-y-1 border-t pt-2 opacity-60 leading-tight"></div>
+                </div>
+
+                <div class="p-3 bg-slate-50 text-[8px] text-slate-400 border-t italic text-center uppercase font-bold tracking-widest">
+                    Elite Wrapz | Business Confidential
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="form-group"><label>Extra Charges (£)</label><input type="number" id="extraCharges" step="0.01"></div>
-  </div>
 
-  <!-- Discount -->
-  <div class="card">
-    <h2>Discount</h2>
-    <div class="form-group"><label>Discount %</label><input type="number" id="discountPercent" step="1"></div>
-    <div class="form-group"><label>Discount Name</label><input type="text" id="discountName"></div>
-  </div>
+    <script>
+        let rowCount = 0;
 
-  <!-- Notes -->
-  <div class="card">
-    <h2>Notes</h2>
-    <textarea id="notes"></textarea>
-  </div>
+        function smartRoundUp(val) {
+            if (val <= 0) return 0;
+            const round50 = Math.ceil(val / 50) * 50;
+            const round100 = Math.ceil(val / 100) * 100;
+            const diff50 = round50 - val;
+            const diff100 = round100 - val;
+            return (diff100 <= diff50) ? round100 : round50;
+        }
 
-  <button type="button" class="btn" onclick="previewQuote()">Preview Quote</button>
-</form>
+        function updateQuoteRef() {
+            const name = document.getElementById('clientName').value.trim();
+            if (!name) {
+                document.getElementById('quoteRef').value = "";
+                document.getElementById('outQuoteNum').innerText = "EW-DRAFT";
+                return;
+            }
+            let firstTwo = name.substring(0, 2).toUpperCase();
+            if (firstTwo.length < 2) firstTwo = (firstTwo + "X").substring(0, 2);
+            const today = new Date();
+            const dd = String(today.getDate()).padStart(2, '0');
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const yy = String(today.getFullYear()).slice(-2);
+            const ref = `EW-${firstTwo}${dd}${mm}${yy}`;
+            document.getElementById('quoteRef').value = ref;
+            document.getElementById('outQuoteNum').innerText = ref;
+        }
 
-<!-- Preview Modal -->
-<div id="quoteModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      Quote Preview
-      <span class="close" onclick="closeModal()">&times;</span>
-    </div>
-    <div class="modal-body">
-      <div id="quotePreview"></div>
-      <br>
-      <button class="btn" onclick="submitQuote()">Save & Email</button>
-    </div>
-  </div>
-</div>
+        function addVinylRow() {
+            rowCount++;
+            const container = document.getElementById('vinylRows');
+            const row = document.createElement('div');
+            row.id = `row-${rowCount}`;
+            row.className = "p-3 bg-slate-50 rounded-lg border border-slate-100 relative group";
+            row.innerHTML = `
+                <button onclick="removeRow(${rowCount})" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition no-print z-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                </button>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <div class="col-span-1">
+                        <label class="block text-[8px] font-black text-slate-400 uppercase mb-0.5">Area</label>
+                        <input type="text" placeholder="Doors" class="w-full p-1.5 text-xs border rounded bg-white v-desc outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[8px] font-black text-slate-400 uppercase mb-0.5">Metres</label>
+                        <input type="number" step="0.1" value="0" class="w-full p-1.5 text-xs border rounded bg-white v-lm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[8px] font-black text-slate-400 uppercase mb-0.5">Qty</label>
+                        <input type="number" value="1" class="w-full p-1.5 text-xs border rounded bg-white v-qty text-center font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[8px] font-black text-slate-400 uppercase mb-0.5">Cost/m (£)</label>
+                        <input type="number" step="0.01" value="0" class="w-full p-1.5 text-xs border rounded bg-white v-cost outline-none">
+                    </div>
+                </div>
+            `;
+            container.appendChild(row);
+            attachListeners();
+        }
 
-<!-- Confirmation Modal -->
-<div id="emailModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      Email Status
-      <span class="close" onclick="closeEmailModal()">&times;</span>
-    </div>
-    <div class="modal-body">
-      <div id="emailStatus"></div>
-      <br>
-      <button class="btn" onclick="closeEmailModal()">Close</button>
-    </div>
-  </div>
-</div>
+        function removeRow(id) {
+            document.getElementById(`row-${id}`).remove();
+            calculate();
+        }
 
-<script>
-  let lastTotal = 0;
-  let lockedDeposit = 0;
+        function attachListeners() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.removeEventListener('input', calculate); 
+                input.addEventListener('input', calculate);
+            });
+            document.getElementById('clientName').addEventListener('input', updateQuoteRef);
+            document.getElementById('vinylVatToggle').addEventListener('change', calculate);
+        }
 
-  function addArea() {
-    const container = document.getElementById("areas");
-    const idx = container.children.length + 1;
-    const div = document.createElement("div");
-    div.className = "form-group";
-    div.style.borderBottom = "1px solid #eee";
-    div.style.paddingBottom = "10px";
-    div.style.marginBottom = "10px";
-    div.innerHTML = `
-      <label>Area ${idx} Label</label>
-      <input type="text" name="areaLabel${idx}" required>
-      <label>Linear Metres</label>
-      <input type="number" name="areaLm${idx}" step="0.01" required>
-      <label>Quantity</label>
-      <input type="number" name="areaQty${idx}" value="1" required>
-      <label>Cost per LM (£)</label>
-      <input type="number" name="areaCost${idx}" step="0.01" required>
-      <label>Vinyl Product Code</label>
-      <input type="text" name="areaCode${idx}">
-    `;
-    container.appendChild(div);
-  }
+        function calculate() {
+            document.getElementById('outClient').innerText = document.getElementById('clientName').value.toUpperCase() || 'CLIENT NAME';
+            document.getElementById('outRef').innerText = document.getElementById('projectRef').value.toUpperCase() || 'ADDRESS / PROJECT';
 
-  function previewQuote() {
-    const total = lastTotal ? lastTotal.toFixed(2) : "Calculated on Save";
-    const deposit = lockedDeposit ? lockedDeposit.toFixed(2) : "Calculated on Save";
-    document.getElementById("quotePreview").innerHTML = `
-      <p><strong>Quote will be saved & emailed.</strong></p>
-      <p><strong>Final Total:</strong> £${total}</p>
-      <p><strong>Deposit Required:</strong> £${deposit}</p>
-      <small>(Full breakdown is included in your internal PDF & email)</small>
-    `;
-    document.getElementById("quoteModal").style.display = "block";
-  }
+            let vinylSubtotal = 0;
+            let itemListHtml = '';
+            const useVat = document.getElementById('vinylVatToggle').checked;
 
-  function submitQuote() {
-    document.getElementById("quoteModal").style.display = "none";
-    document.getElementById("emailModal").style.display = "block";
-    document.getElementById("emailStatus").innerText = "⏳ Sending...";
+            document.querySelectorAll('#vinylRows > div').forEach(row => {
+                const desc = row.querySelector('.v-desc').value || 'Item';
+                const qty = parseFloat(row.querySelector('.v-qty').value) || 0;
+                const lm = parseFloat(row.querySelector('.v-lm').value) || 0;
+                const costPerMetre = parseFloat(row.querySelector('.v-cost').value) || 0;
+                
+                const lineBase = (qty * lm * costPerMetre);
+                const lineFinal = useVat ? lineBase * 1.2 : lineBase;
+                
+                vinylSubtotal += lineFinal;
+                if(qty > 0 && lm > 0) {
+                    itemListHtml += `<div class="flex justify-between"><span>${qty}x ${lm}m ${desc}</span><span>£${lineFinal.toFixed(2)}</span></div>`;
+                }
+            });
+            document.getElementById('printItemList').innerHTML = itemListHtml;
 
-    const areaDivs = document.querySelectorAll("#areas .form-group");
-    let areas = [];
-    areaDivs.forEach((div, i) => {
-      const label = div.querySelector(`input[name='areaLabel${i+1}']`).value;
-      const lm = div.querySelector(`input[name='areaLm${i+1}']`).value;
-      const qty = div.querySelector(`input[name='areaQty${i+1}']`).value;
-      const cost = div.querySelector(`input[name='areaCost${i+1}']`).value;
-      const code = div.querySelector(`input[name='areaCode${i+1}']`).value;
-      areas.push({ label, lm, qty, costPerLM: cost, code });
-    });
+            const logistics = (parseFloat(document.getElementById('accommodation').value) || 0) + 
+                              (parseFloat(document.getElementById('travel').value) || 0) + 
+                              (parseFloat(document.getElementById('postage').value) || 0) + 
+                              (parseFloat(document.getElementById('importFees').value) || 0) + 
+                              (parseFloat(document.getElementById('extras').value) || 0);
+            
+            const labour = (parseFloat(document.getElementById('labourHours').value) || 0) * 45;
 
-    fetch("https://script.google.com/macros/s/AKfycbwDtfMaObFsfAgs2jMSGa93EKsljS6U18oE04BH5KqdPAjqYfMpHX7GL-u8AReEzus/exec", {
-      method: "POST",
-      body: new URLSearchParams({
-        clientName: document.getElementById("clientName").value,
-        clientEmail: document.getElementById("clientEmail").value,
-        clientPhone: document.getElementById("clientPhone").value,
-        clientAddress: document.getElementById("clientAddress").value,
-        jobHours: document.getElementById("jobHours").value,
-        accomNights: document.getElementById("accomNights").value,
-        travelBuffer: document.getElementById("travelBuffer").value,
-        repairs: document.getElementById("repairs").value,
-        extraCharges: document.getElementById("extraCharges").value,
-        discountPercent: document.getElementById("discountPercent").value,
-        discountName: document.getElementById("discountName").value,
-        notes: document.getElementById("notes").value,
-        areas: JSON.stringify(areas)
-      })
-    })
-    .then(res=>res.json())
-    .then(res=>{
-      if(res.success){
-        const expiry = new Date();
-        expiry.setDate(expiry.getDate() + 30);
-        const expiryDate = expiry.toLocaleDateString("en-GB");
-        const clientName = document.getElementById("clientName").value || "Client";
-        const clientEmail = document.getElementById("clientEmail").value || "";
-        const quoteRef = res.quoteNumber || "";
-        const total = res.totalWithMargin ? res.totalWithMargin.toFixed(2) : "0.00";
-        const deposit = res.deposit ? res.deposit.toFixed(2) : "0.00";
-        lastTotal = res.totalWithMargin;
-        lockedDeposit = res.deposit;
+            const baseCost = vinylSubtotal + logistics + labour;
+            const marginPercent = (parseFloat(document.getElementById('margin').value) || 0) / 100;
+            const marginAmt = baseCost * marginPercent;
+            
+            const rawSubtotal = baseCost + marginAmt;
+            const discountAmt = rawSubtotal * ((parseFloat(document.getElementById('discountPercent').value) || 0) / 100);
+            const totalAfterDiscount = rawSubtotal - discountAmt;
 
-        const subject = encodeURIComponent(`Your Elite Wrapz Quote | ${quoteRef}`);
-        const body = encodeURIComponent(
-`Hi ${clientName},
+            const finalRoundedTotal = smartRoundUp(totalAfterDiscount);
+            const roundingAdjustment = finalRoundedTotal - totalAfterDiscount;
 
-Thank you for considering Elite Wrapz for your vinyl wrapping needs. We are pleased to provide you with your quote (Quote Number: ${quoteRef}) as follows:
+            const roundedDeposit = smartRoundUp(vinylSubtotal + logistics);
+            const balanceDue = finalRoundedTotal - roundedDeposit;
+            const netProfit = (marginAmt - discountAmt) + roundingAdjustment;
 
-TOTAL QUOTE: £${total}
-DEPOSIT REQUIRED: £${deposit}
+            document.getElementById('resMaterials').innerText = `£${vinylSubtotal.toFixed(2)}`;
+            document.getElementById('resLogistics').innerText = `£${logistics.toFixed(2)}`;
+            document.getElementById('resLabour').innerText = `£${labour.toFixed(2)}`;
+            document.getElementById('resTotal').innerText = `£${finalRoundedTotal.toFixed(0)}`;
+            document.getElementById('resDeposit').innerText = `£${roundedDeposit.toFixed(0)}`;
+            document.getElementById('resBalance').innerText = `£${balanceDue.toFixed(2)}`;
+            document.getElementById('resProfit').innerText = `£${netProfit.toFixed(2)}`;
 
-All payments are to be made via bank transfer. The deposit is due upon acceptance of this quote to secure your booking. The final invoice is due on-site once the work has been completed.
+            if(discountAmt > 0) {
+                document.getElementById('discountRow').classList.remove('hidden');
+                document.getElementById('resDiscount').innerText = `-£${discountAmt.toFixed(2)}`;
+            } else {
+                document.getElementById('discountRow').classList.add('hidden');
+            }
+        }
 
-To accept this quote, please reply to this email, quoting the quote number provided above. Alternatively, you may contact us via WhatsApp on 07424088434, also quoting your quote number.
-
-You can also opt for an interest-free payment plan (minus the deposit). Contact us for details.
-
-IMPORTANT INFORMATION:
-- DISCOUNTS: Quote total doesn't include any discounts, these will be deducted upon final invoice
-- QUOTE VALIDITY: Valid until ${expiryDate}
-- FULL TERMS: Our full Terms & Conditions can be found here - www.elitewrapz.uk/termsandconditions
-- VAT: As a sole trader, Elite Wrapz is not VAT registered, and VAT is not currently charged
-
-We look forward to assisting you with your vinyl wrapping project!
-
-Best regards,
-Elite Wrapz`
-        );
-
-        const mailtoLink = `mailto:${clientEmail}?subject=${subject}&body=${body}`;
-        document.getElementById("emailStatus").innerHTML = `
-          ✅ Quote saved & emailed (Ref: ${quoteRef})<br>
-          <strong>FINAL TOTAL:</strong> £${total}<br>
-          <strong>DEPOSIT REQUIRED:</strong> £${deposit}<br><br>
-          <a href="${mailtoLink}" class="btn" style="text-decoration:none;">📧 Email Quote to Client</a>
-        `;
-      } else {
-        document.getElementById("emailStatus").innerText=`❌ Error: ${res.error}`;
-      }
-    })
-    .catch(err=>{
-      document.getElementById("emailStatus").innerText=`❌ Network Error: ${err.message}`;
-    });
-  }
-
-  function closeModal(){ document.getElementById("quoteModal").style.display="none"; }
-  function closeEmailModal(){ document.getElementById("emailModal").style.display="none"; }
-</script>
+        window.onload = () => { 
+            const d = new Date();
+            document.getElementById('liveDate').innerText = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+            addVinylRow(); 
+        };
+    </script>
 </body>
 </html>
