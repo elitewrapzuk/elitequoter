@@ -8,26 +8,30 @@
     <style>
         :root { --brand: #01FABF; }
         
-        /* PDF Optimization */
+        /* PDF Optimization - Clean Grayscale */
         @media print {
-            @page { size: A4; margin: 0.8cm; }
+            @page { size: A4; margin: 1cm; }
             .no-print { display: none !important; }
-            body { background: white; padding: 0; margin: 0; font-size: 10pt; }
+            body { background: white; padding: 0; margin: 0; color: black; }
             .print-card { 
-                border: 1px solid #eee; 
+                border: 1px solid #000; 
                 box-shadow: none !important; 
                 width: 100% !important;
                 max-width: 100% !important;
                 position: static !important;
                 border-radius: 0 !important;
             }
-            .brand-bg { background-color: #01FABF !important; -webkit-print-color-adjust: exact; }
-            .brand-text { color: #01FABF !important; -webkit-print-color-adjust: exact; }
+            /* Remove all brand colors for print */
+            .brand-bg { background-color: #f8fafc !important; color: black !important; -webkit-print-color-adjust: exact; border-bottom: 2px solid #000 !important; }
+            .brand-text { color: black !important; }
             .grid { display: block !important; }
-            #quoteOutput { margin: 0 !important; border: none !important; }
+            #quoteOutput { margin: 0 !important; border: 1px solid #ccc !important; }
+            /* Ensure logo is standard */
+            #pdfLogo { filter: none !important; brightness: 100% !important; }
+            .deposit-box { background-color: #eee !important; color: black !important; border: 1px solid #000 !important; }
         }
 
-        .brand-border-focus:focus { border-color: var(--brand); ring: 2px; ring-color: var(--brand); }
+        .brand-border-focus:focus { border-color: #94a3b8; ring: 2px; ring-color: #cbd5e1; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen p-3 md:p-6 font-sans text-slate-800">
@@ -37,9 +41,9 @@
         <!-- Input Section -->
         <div class="lg:col-span-2 space-y-4 no-print">
             <!-- Header with Logo -->
-            <div class="flex flex-col sm:flex-row items-center justify-between bg-white p-4 rounded-xl shadow-sm border-l-4 border-[#01FABF] gap-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between bg-white p-4 rounded-xl shadow-sm border-l-4 border-slate-900 gap-4">
                 <div class="flex items-center gap-4">
-                    <img src="elitewrapz.png" alt="Logo" class="h-12 w-auto object-contain" onerror="this.style.display='none'">
+                    <img src="elitewrapz.png" alt="Logo" class="h-12 w-auto object-contain" onerror="this.parentElement.style.border='none'">
                     <div>
                         <h1 class="text-xl font-black text-slate-900 italic tracking-tighter uppercase">Elite Wrapz</h1>
                         <p class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.2em]">New Quote</p>
@@ -52,14 +56,14 @@
 
             <!-- Client Info -->
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-sm font-black mb-3 flex items-center gap-2 uppercase tracking-wider">
-                    <span class="w-1.5 h-4 bg-[#01FABF] rounded-full"></span>
+                <h2 class="text-sm font-black mb-3 flex items-center gap-2 uppercase tracking-wider text-slate-900">
+                    <span class="w-1.5 h-4 bg-slate-900 rounded-full"></span>
                     Project Identification
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Client Name</label>
-                        <input type="text" id="clientName" placeholder="e.g. Andy Smith" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus transition-all">
+                        <input type="text" id="clientName" placeholder="Name" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus transition-all">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Quote Reference</label>
@@ -67,7 +71,7 @@
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Site Address / Project Title</label>
-                        <input type="text" id="projectRef" placeholder="e.g. Kitchen Refurbishment, SE1" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
+                        <input type="text" id="projectRef" placeholder="Address or Description" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
                     </div>
                 </div>
             </div>
@@ -75,14 +79,14 @@
             <!-- Vinyl Sections -->
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                 <div class="flex justify-between items-center mb-3">
-                    <h2 class="text-sm font-black flex items-center gap-2 uppercase tracking-wider">
-                        <span class="w-1.5 h-4 bg-[#01FABF] rounded-full"></span>
+                    <h2 class="text-sm font-black flex items-center gap-2 uppercase tracking-wider text-slate-900">
+                        <span class="w-1.5 h-4 bg-slate-900 rounded-full"></span>
                         Vinyl Breakdown
                     </h2>
                     <div class="flex items-center gap-4">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="vinylVatToggle" checked class="w-3.5 h-3.5 accent-[#01FABF]">
-                            <span class="text-[9px] font-black text-slate-400 uppercase">Apply 20% VAT to Vinyl Cost</span>
+                            <input type="checkbox" id="vinylVatToggle" checked class="w-3.5 h-3.5 accent-slate-900">
+                            <span class="text-[9px] font-black text-slate-400 uppercase">Apply 20% VAT to Vinyl</span>
                         </label>
                         <button onclick="addVinylRow()" class="text-[10px] bg-slate-900 text-white px-3 py-1 rounded-full hover:bg-black transition font-black uppercase">+ Add Area</button>
                     </div>
@@ -92,15 +96,15 @@
 
             <!-- Costs Section -->
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-sm font-black mb-3 flex items-center gap-2 uppercase tracking-wider">
-                    <span class="w-1.5 h-4 bg-[#01FABF] rounded-full"></span>
+                <h2 class="text-sm font-black mb-3 flex items-center gap-2 uppercase tracking-wider text-slate-900">
+                    <span class="w-1.5 h-4 bg-slate-900 rounded-full"></span>
                     Logistics & Margin
                 </h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Labour Hours</label>
                         <input type="number" id="labourHours" value="0" step="0.5" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
-                        <p class="text-[9px] text-[#01FABF] font-black mt-1 uppercase italic">System Rate: £45/hr</p>
+                        <p class="text-[9px] text-slate-400 font-black mt-1 uppercase italic">Rate: £45/hr</p>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Shipping (£)</label>
@@ -123,8 +127,8 @@
                         <input type="number" id="extras" value="0" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1 text-red-500">Discount %</label>
-                        <input type="number" id="discountPercent" value="0" class="w-full p-2 text-sm border rounded-md border-red-100 outline-none focus:ring-1 focus:ring-red-400">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Discount %</label>
+                        <input type="number" id="discountPercent" value="0" class="w-full p-2 text-sm border rounded-md outline-none brand-border-focus">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Margin %</label>
@@ -133,7 +137,7 @@
                 </div>
             </div>
 
-            <button onclick="window.print()" class="w-full bg-[#01FABF] text-slate-900 py-4 rounded-xl font-black hover:brightness-105 transition flex items-center justify-center gap-3 shadow-lg shadow-[#01FABF]/10 active:scale-[0.99]">
+            <button onclick="window.print()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black hover:bg-black transition flex items-center justify-center gap-3 shadow-lg active:scale-[0.99]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
                 SAVE SINGLE-PAGE PDF RECORD
             </button>
@@ -143,18 +147,18 @@
         <div class="lg:sticky lg:top-4 h-fit">
             <div id="quoteOutput" class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden print-card">
                 
-                <div class="p-5 bg-slate-900 text-white relative brand-bg">
-                    <div class="flex items-center gap-3 mb-4">
-                        <img src="elitewrapz.png" alt="Elite Wrapz" class="h-10 w-auto brightness-0 invert" id="pdfLogo">
-                        <div>
-                            <h3 class="font-bold text-slate-900 uppercase tracking-[0.2em] text-[8px] opacity-60">Job Reference</h3>
-                            <p id="outQuoteNum" class="text-lg font-black tracking-tighter italic text-slate-900">EW-DRAFT</p>
+                <div class="p-5 bg-slate-50 border-b border-slate-200 relative brand-bg">
+                    <div class="flex items-center gap-4 mb-4">
+                        <img src="elitewrapz.png" alt="Elite Wrapz" class="h-10 w-auto object-contain" id="pdfLogo">
+                        <div class="border-l border-slate-300 pl-4">
+                            <h3 class="font-bold text-slate-400 uppercase tracking-[0.2em] text-[8px]">Job Reference</h3>
+                            <p id="outQuoteNum" class="text-lg font-black tracking-tighter italic text-slate-900 leading-none">EW-DRAFT</p>
                         </div>
                     </div>
                     
-                    <div class="pt-3 border-t border-slate-900/20">
-                        <p id="outClient" class="text-md font-black truncate text-slate-900 uppercase">CLIENT NAME</p>
-                        <p id="outRef" class="text-[9px] text-slate-900/70 truncate uppercase font-bold tracking-tight">ADDRESS / PROJECT</p>
+                    <div class="pt-3">
+                        <p id="outClient" class="text-sm font-black truncate text-slate-900 uppercase">CLIENT NAME</p>
+                        <p id="outRef" class="text-[9px] text-slate-500 truncate uppercase font-bold tracking-tight">ADDRESS / PROJECT</p>
                     </div>
                 </div>
                 
@@ -173,7 +177,7 @@
                             <span class="text-slate-500 font-bold uppercase">Labour Allocation</span>
                             <span id="resLabour" class="font-black text-slate-900">£0.00</span>
                         </div>
-                        <div id="discountRow" class="hidden flex justify-between text-red-600 font-black italic">
+                        <div id="discountRow" class="hidden flex justify-between text-slate-900 font-black italic">
                             <span>Applied Discount</span>
                             <span id="resDiscount">-£0.00</span>
                         </div>
@@ -181,24 +185,24 @@
                     
                     <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 flex justify-between items-center">
                         <div class="text-[8px] font-black text-slate-400 uppercase">Estimated Net Profit</div>
-                        <div id="resProfit" class="text-sm font-black text-green-600 tracking-tighter">£0.00</div>
+                        <div id="resProfit" class="text-sm font-black text-slate-600 tracking-tighter">£0.00</div>
                     </div>
 
-                    <div class="pt-1 border-t border-slate-100">
+                    <div class="pt-1">
                         <div class="flex justify-between items-end">
                             <span class="text-[9px] font-black text-slate-400 uppercase pb-1 tracking-widest">Total Quote</span>
-                            <span id="resTotal" class="text-3xl font-black text-slate-900 tracking-tighter leading-none">£0.00</span>
+                            <span id="resTotal" class="text-4xl font-black text-slate-900 tracking-tighter leading-none">£0.00</span>
                         </div>
                     </div>
 
                     <!-- Payment Cards -->
-                    <div class="p-5 bg-slate-900 text-[#01FABF] rounded-xl shadow-inner">
+                    <div class="p-5 bg-slate-900 text-white rounded-xl shadow-inner deposit-box">
                         <div class="flex justify-between items-center mb-1">
                             <span class="font-black uppercase text-[9px] tracking-widest opacity-80">Booking Deposit</span>
-                            <span class="text-[8px] font-bold bg-[#01FABF] text-slate-900 px-1.5 py-0.5 rounded">RESERVE DATE</span>
+                            <span class="text-[8px] font-bold bg-white text-slate-900 px-1.5 py-0.5 rounded">RESERVE DATE</span>
                         </div>
                         <div id="resDeposit" class="text-4xl font-black tracking-tighter leading-none">£0.00</div>
-                        <div class="mt-4 pt-3 border-t border-[#01FABF]/20">
+                        <div class="mt-4 pt-3 border-t border-white/20">
                             <div class="flex justify-between items-center text-[10px] font-black">
                                 <span class="opacity-70">Remaining Balance</span>
                                 <span id="resBalance" class="text-white">£0.00</span>
@@ -211,7 +215,7 @@
                 </div>
 
                 <div class="p-3 bg-slate-50 text-[8px] text-slate-400 border-t italic text-center uppercase font-bold tracking-widest">
-                    Elite Wrapz | Business Confidential
+                    Elite Wrapz | Business Confidential Record
                 </div>
             </div>
         </div>
@@ -254,8 +258,8 @@
             row.id = `row-${rowCount}`;
             row.className = "p-3 bg-slate-50 rounded-lg border border-slate-100 relative group";
             row.innerHTML = `
-                <button onclick="removeRow(${rowCount})" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition no-print z-10">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                <button onclick="removeRow(${rowCount})" class="absolute -top-1.5 -right-1.5 bg-slate-900 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition no-print z-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                     <div class="col-span-1">
